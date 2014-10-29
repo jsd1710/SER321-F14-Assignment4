@@ -32,7 +32,7 @@
 #include <jsonrpc/rpc.h>
 #include <iostream>
 #include <stdlib.h>
-#include "Waypoint.hpp"
+#include <Waypoint.hpp>
 
 #include "abstractcalculatestubserver.h"
 

@@ -180,7 +180,7 @@
          <compilerarg value="${cxxflag}"/>
          <libset dir="${lib.dir}" libs="${server.lib.list}"/>
          <fileset dir="${src.dir}/server"
-                  includes="CalculateServer.cpp,Waypoint.hpp"/>
+                  includes="CalculateServer.cpp,Waypoint.cpp"/>
       </cc>
    </target>
 
