@@ -118,7 +118,7 @@
          <then>
             <echo message="detected a linux host"/>
             <property name="cxxflag" value="-DI_AM_NOT_USED"/>
-            <property name="linkflag" value="-Wl,--no-enum-size-warning"/>
+            <property name="linkflag" value="-Wl,-lm"/>
             <property name="client.lib.list" value="jsonrpc,stdc++"/>
             <property name="server.lib.list" value="jsonrpc,stdc++"/>
             <property name="lib.dir" value="/usr/local/lib"/>
