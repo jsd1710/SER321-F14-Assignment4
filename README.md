@@ -7,3 +7,10 @@ This project is to demonstrate the understanding of jsonrpc and jsoncpp in C++ a
 * sudo yum install curlpp-devel.x86_64
 * Make jsonrpc files from this [tutorial](http://pooh.poly.asu.edu/Cst420/Resources/setupJsonJavaNJsonRPCcpp.html).
 * sudo ln -s /usr/local/lib/libjsonrpc.so. /lib64/libjsonrpc.so.      //This is to make the jsonrpc file from the MAKEFILE visible to the Fedora Linker
+
+### Dependencies (OTHER) ###
+* g++
+* libcurl4-openssl-dev
+* cmake
+* ant-contrib
+* ant-contrib-cpptasks
