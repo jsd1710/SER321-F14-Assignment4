@@ -9,6 +9,7 @@ This project is to demonstrate the understanding of jsonrpc and jsoncpp in C++ a
 * sudo ln -s /usr/local/lib/libjsonrpc.so. /lib64/libjsonrpc.so.      //This is to make the jsonrpc file from the MAKEFILE visible to the Fedora Linker
 
 ### Dependencies (OTHER) ###
+* antlibs.jar extracted to home dir
 * g++
 * libcurl4-openssl-dev
 * cmake
