@@ -118,10 +118,10 @@
 				<then>
 					<echo message="detected a linux host"/>
 					<property name="cxxflag" value="-std=c++0x"/>
-					<property name="linkflag" value="-Wl,/lib64/libm.so.6,-lm"/>
-					<property name="client.lib.list" value="jsonrpc,stdc++"/>
-					<property name="server.lib.list" value="jsonrpc,stdc++"/>
-					<property name="lib.dir" value="/usr/local/lib"/>
+					<property name="linkflag" value="-Wl,-lm"/>
+					<property name="client.lib.list" value="jsonrpc,stdc++,fltk"/>
+					<property name="server.lib.list" value="jsonrpc,stdc++,m"/>
+					<property name="lib.dir" value="/usr/lib/"/>
 				</then>
 			</elseif>
 			<else>
