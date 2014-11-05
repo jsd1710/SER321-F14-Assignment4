@@ -13,5 +13,10 @@
         "method": "removeWaypoint",
         "params": ["name"],
         "returns": true
+    },
+    {	//This is how you define a method with positional parameters.
+        "method": "add",
+        "params": [{name:blah,lat:0.0,lon:0.0,ele:0.0,address:any}],
+        "returns": true
     }
 ]
