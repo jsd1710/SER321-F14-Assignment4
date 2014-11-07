@@ -5,7 +5,7 @@
         "returns": "I am the Waypoint service."
     },
     {	//This is how you define a method with positional parameters.
-        "method": "addWaypoint",
+        "method": "add",
         "params": [0.0, 0.0, 0.0, "name"],
         "returns": true
     },
@@ -15,8 +15,8 @@
         "returns": true
     },
     {	//This is how you define a method with positional parameters.
-        "method": "add",
-        "params": [{name:blah,lat:0.0,lon:0.0,ele:0.0,address:any}],
+        "method": "addWaypoint",
+        "params": [{"name":"blah","lat":0.0,"lon":0.0,"ele":0.0,"address":"any"}],
         "returns": true
     }
 ]

@@ -21,7 +21,7 @@
 	</target>
 
 	<path id="compile.classpath">
-		<pathelement location="${build}"/>
+		<pathelement location="${classes.dir}"/>
 		<fileset dir="${basedir}/lib">
 			<include name="org.json-20140503.jar"/>
 		</fileset>
@@ -191,6 +191,15 @@
 		<exec dir="${basedir}" executable="${dist.dir}/WaypointRPCServer">
 			<arg line="${port.num}"/>
 		</exec>
+	</target>
+	<target name="execute.java.client" depends="prepare" description="Run the java client">
+		<echo message="command line client: java -cp classes -Djava.security.policy=policyClient cst420.jsonrpc.WaypointJavaClient http://${host.name}:${port.num}" />
+		<java classname="assignment4.WaypointJavaClient" fork="yes">
+			<classpath refid="compile.classpath"/>
+			<sysproperty key="java.security.policy" value="policyClient"/>
+			<arg value="${user.name}"/>
+			<arg value="http://${host.name}:${port.num}"/>
+		</java>
 	</target>
 
 </project>

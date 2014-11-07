@@ -53,7 +53,8 @@ int main(int argc, char*argv[])
 		while (true)
 		{
 			cout << "Methods: \n"
-					"	addWaypoint lat lon ele name -- eg:addWaypoint 1 2 3 ASU-Poly \n"
+					"	add lat lon ele name -- eg:add 1 2 3 ASU-Poly \n"
+					"	addWaypoint jsonWaypoint -- eg:addWaypoint {\"lat\":1,\"lon\":2,\"ele\":3,\"name\":\"ASU-POLY\"} \n"
 					"	removeWaypoint name -- eg:removeWaypoint ASU-Poly \n"
 					"Input>	";
 			getline(cin, inLine);
@@ -64,7 +65,7 @@ int main(int argc, char*argv[])
 			if (tokens.size() > 1)
 			{
 				//Waypoints
-				if (tokens[0] == "addWaypoint")
+				if (tokens[0] == "add")
 				{
 					double lat, lon, ele;
 
@@ -76,8 +77,18 @@ int main(int argc, char*argv[])
 					istringstream eleStream(tokens[3]);
 					eleStream >> ele;
 
-					wc.addWaypoint(lat, lon, ele, name);
+					wc.add(lat, lon, ele, name);
 					cout << "Sent: 	Waypoint(" << lat << ", " << lon << ", " << ele << ", " << name << "); \n" << endl;
+				}
+				else if (tokens[0] == "addWaypoint")
+				{
+					Json::Reader reader;
+					Json::Value root;
+
+					reader.parse(tokens[1], root);
+
+					wc.addWaypoint(root);
+					cout << "Sent: 	Waypoint " << tokens[1] << "\n" << endl;
 				}
 				else if (tokens[0] == "removeWaypoint")
 				{

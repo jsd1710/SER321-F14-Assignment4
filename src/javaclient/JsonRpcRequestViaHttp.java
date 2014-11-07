@@ -1,7 +1,7 @@
 /*
  */
 
-package cst420.jsonrpc;
+package assignment4;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,30 +14,37 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-public class JsonRpcRequestViaHttp {
+public class JsonRpcRequestViaHttp 
+{
 
     private final Map<String, String> headers;
     private URL url;
 
-    public JsonRpcRequestViaHttp(URL url) {
+    public JsonRpcRequestViaHttp(URL url) 
+    {
         this.url = url;
         this.headers = new HashMap<String, String>();
     }
 
-    public void setHeader(String key, String value) {
+    public void setHeader(String key, String value) 
+    {
         this.headers.put(key, value);
     }
 
-    public String call(String requestData) throws Exception {
+    public String call(String requestData) throws Exception 
+    {
         String respData = post(url, headers, requestData);
         return respData;
     }
 
     private String post(URL url, Map<String, String> headers, String data)
-            throws Exception {
+            throws Exception 
+            {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        if (headers != null) {
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
+        if (headers != null) 
+        {
+            for (Map.Entry<String, String> entry : headers.entrySet()) 
+            {
                 connection.addRequestProperty(entry.getKey(), entry.getValue());
             }
         }
@@ -47,18 +54,23 @@ public class JsonRpcRequestViaHttp {
         connection.setDoOutput(true);
         connection.connect();
         OutputStream out = null;
-        try {
+        try 
+        {
             out = connection.getOutputStream();
             out.write(data.getBytes());
             out.flush();
             out.close();
             int statusCode = connection.getResponseCode();
-            if (statusCode != HttpURLConnection.HTTP_OK) {
+            if (statusCode != HttpURLConnection.HTTP_OK) 
+            {
                 throw new Exception(
                           "Unexpected status from post: " + statusCode);
             }
-        } finally {
-            if (out != null) {
+        } 
+        finally 
+        {
+            if (out != null) 
+            {
                 out.close();
             }
         }
@@ -68,22 +80,28 @@ public class JsonRpcRequestViaHttp {
                             "" : responseEncoding.trim());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         InputStream in = connection.getInputStream();
-        try {
+        try 
+        {
             in = connection.getInputStream();
-            if ("gzip".equalsIgnoreCase(responseEncoding)) {
+            if ("gzip".equalsIgnoreCase(responseEncoding)) 
+            {
                 in = new GZIPInputStream(in);
             }
             in = new BufferedInputStream(in);
 
             byte[] buff = new byte[1024];
             int n;
-            while ((n = in.read(buff)) > 0) {
+            while ((n = in.read(buff)) > 0) 
+            {
                 bos.write(buff, 0, n);
             }
             bos.flush();
             bos.close();
-        } finally {
-            if (in != null) {
+        } 
+        finally 
+        {
+            if (in != null) 
+            {
                 in.close();
             }
         }

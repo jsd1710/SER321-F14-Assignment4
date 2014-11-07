@@ -1,4 +1,5 @@
 #include <jsonrpc/rpc.h>
+#include <jsonrpc/json/json.h>
 #include <iostream>
 #include <stdlib.h>
 #include <map>
@@ -18,7 +19,8 @@ public:
 
    virtual std::string serviceInfo();
 
-   virtual bool addWaypoint(const double& latInput, const double& lonInput, const double& eleInput, const string& nameInput);
+   virtual bool add(const double& latInput, const double& lonInput, const double& eleInput, const string& nameInput);
+   virtual bool addWaypoint(const Json::Value& waypoint);
    virtual bool removeWaypoint(const string& nameInput);
 private:
    map<string, Waypoint> waypoints;
@@ -40,13 +42,33 @@ string WaypointServer::serviceInfo()
    return  msg.append(ss.str());
 }
 
-bool WaypointServer::addWaypoint(const double& latInput, const double& lonInput, const double& eleInput, const std::string& nameInput)
+bool WaypointServer::add(const double& latInput, const double& lonInput, const double& eleInput, const std::string& nameInput)
 {
 	Waypoint temp(latInput, lonInput, eleInput, nameInput);
-	waypoints.insert(pair<string,Waypoint>(nameInput,temp));
-	cout << "Added:		" << "Waypoint(" << latInput << ", " << lonInput << ", " << eleInput << ", " << nameInput << ");" << endl;
-	return true;
+	bool added = waypoints.insert(pair<string,Waypoint>(nameInput,temp)).second;
+	if (added)
+	{
+		cout << "Added:		" << "Waypoint(" << latInput << ", " << lonInput << ", " << eleInput << ", " << nameInput << ");" << endl;
+	}
+	return added;
 }
+
+bool WaypointServer::addWaypoint(const Json::Value& waypoint)
+{
+	string name(waypoint.get("name", "ERROR").asString());
+	double lat(waypoint.get("lat", 0).asDouble());
+	double lon(waypoint.get("lon", 0).asDouble());
+	double ele(waypoint.get("ele", 0).asDouble());
+	Waypoint temp(lat,lon,ele,name);
+
+	bool added = waypoints.insert(pair<string,Waypoint>(name,temp)).second;
+	if (added)
+	{
+		cout << "Added:		" << "Waypoint(" << lat << ", " << lon << ", " << ele << ", " << name << ");" << endl;
+	}
+	return added;
+}
+
 bool WaypointServer::removeWaypoint(const std::string& nameInput)
 {
 	if (waypoints.find(nameInput) != waypoints.end())
