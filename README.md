@@ -15,4 +15,6 @@ This project is to demonstrate the understanding of jsonrpc and jsoncpp in C++ a
 * cmake
 * ant-contrib
 * ant-contrib-cpptasks
-* Make jsonrpc files from this [tutorial](http://pooh.poly.asu.edu/Cst420/Resources/setupJsonJavaNJsonRPCcpp.html).
+* Make jsonrpc files from this [tutorial]
+(http://pooh.poly.asu.edu/Cst420/Resources/setupJsonJavaNJsonRPCcpp.html).
+* libjsoncpp-dev
