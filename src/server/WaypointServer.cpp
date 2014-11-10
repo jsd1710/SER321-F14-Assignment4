@@ -22,6 +22,12 @@ public:
    virtual bool add(const double& latInput, const double& lonInput, const double& eleInput, const string& nameInput);
    virtual bool addWaypoint(const Json::Value& waypoint);
    virtual bool removeWaypoint(const string& nameInput);
+   virtual Json::Value getWaypoint(const string& name);
+   virtual Json::Value getWaypoints();
+   
+   virtual double getDistanceGCTo(const string& w1, const string& w2);
+   virtual double getBearingGCInitTo(const string& w1, const string& w2);
+
 private:
    map<string, Waypoint> waypoints;
    int portNum;
@@ -81,6 +87,114 @@ bool WaypointServer::removeWaypoint(const std::string& nameInput)
 	{
 		cout << "Error:		There was no '" << nameInput << "' Waypoint!" << endl;
 		return false;
+	}
+}
+
+Json::Value WaypointServer::getWaypoint(const string& name)
+{
+	if (waypoints.find(name) != waypoints.end())
+	{
+		Waypoint temp(waypoints.at(name));
+		string name = temp.name;
+		double lat = temp.lat;
+		double lon = temp.lon;
+		double ele = temp.ele;
+
+		std::ostringstream waypointStringStream;
+		waypointStringStream << "{\"name\":" << name << ","
+				<< "\"lat\":" << lat << ","
+				<< "\"lon\":" << lon << ","
+				<< "\"ele\":" << ele << "}";
+		std::string waypointString = waypointStringStream.str();
+
+		Json::Value jsonWaypoint(waypointString);
+		return jsonWaypoint;
+
+	}
+	else
+	{
+		cout << "Error:		There was no '" << name << "' Waypoint!" << endl;
+		Json::Value result("{\"result\":\"ERROR\"}");
+		return result;
+	}
+}
+
+Json::Value WaypointServer::getWaypoints()
+{
+	Json::Value waypointJSONObject;
+	Json::Value waypointJSONArray;
+	waypointJSONArray.append(Json::Value::null);
+	waypointJSONArray.clear();
+	waypointJSONObject["waypoints"] = waypointJSONArray;
+
+	for (map<string,Waypoint>::iterator itr = waypoints.begin(); itr != waypoints.end(); itr++)
+	{
+		Waypoint temp(itr->second);
+		string name = temp.name;
+		double lat = temp.lat;
+		double lon = temp.lon;
+		double ele = temp.ele;
+
+		Json::Value jsonWaypoint;
+		jsonWaypoint["name"] = name.c_str();
+		jsonWaypoint["lat"] = lat;
+		jsonWaypoint["lon"] = lon;
+		jsonWaypoint["ele"] = ele;
+
+		waypointJSONArray[waypointJSONArray.size()] = jsonWaypoint;
+	}
+	waypointJSONObject["waypoints"] = waypointJSONArray;
+
+	Json::FastWriter writer;
+	Json::Features::strictMode();
+	string output = writer.write(waypointJSONObject);
+	Json::Value temp(output);
+
+	cout << "SENT JSONArray:	" << temp.asString() << endl;
+	return temp;
+}
+
+double WaypointServer::getDistanceGCTo(const string& w1, const string& w2)
+{
+	string name;
+	double lat,lon,ele;
+	double result;
+	if ((waypoints.find(w1) != waypoints.end()) && (waypoints.find(w2) != waypoints.end()))
+	{
+		Waypoint temp1(waypoints.at(w1));
+		Waypoint temp2(waypoints.at(w2));
+
+		result = temp1.distanceGCTo(temp2, 0);
+
+		cout << "SENT Distance:	" << result << "\n" << endl;
+		return result;
+	}
+	else
+	{
+		cout << "Error:		Could not calculate GC Distance!" << "\n" << endl;
+		return 0;
+	}
+}
+
+double WaypointServer::getBearingGCInitTo(const string& w1, const string& w2)
+{
+	string name;
+	double lat,lon,ele;
+	double result;
+	if ((waypoints.find(w1) != waypoints.end()) && (waypoints.find(w2) != waypoints.end()))
+	{
+		Waypoint temp1(waypoints.at(w1));
+		Waypoint temp2(waypoints.at(w2));
+
+		result = temp1.bearingGCInitTo(temp2,0);
+
+		cout << "SENT Bearing:	" << result << "\n" << endl;
+		return result;
+	}
+	else
+	{
+		cout << "EERROR:		Could not calculate GC Bearing!" << "\n" << endl;
+		return 0;
 	}
 }
 

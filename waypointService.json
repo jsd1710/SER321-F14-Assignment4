@@ -18,5 +18,25 @@
         "method": "addWaypoint",
         "params": [{"name":"blah","lat":0.0,"lon":0.0,"ele":0.0,"address":"any"}],
         "returns": true
+    },
+    {	//This is how you define a method with positional parameters.
+        "method": "getWaypoint",
+        "params": ["name"],
+        "returns": {"name":"ASU-Poly","lat":0.0,"lon":0.0,"ele":0.0}
+    },
+    {	//This is how you define a method with positional parameters.
+        "method": "getWaypoints",
+        "params": [],
+        "returns": [{"name":"ASU-Poly","lat":0.0,"lon":0.0,"ele":0.0},{"name":"ASU-Tempe","lat":1.0,"lon":1.0,"ele":1.0}]
+    },
+    {	//This is how you define a method with positional parameters.
+        "method": "getDistanceGCTo",
+        "params": ["waypoint1","waypoint2"],
+        "returns": 0.0
+    },
+        {	//This is how you define a method with positional parameters.
+        "method": "getBearingGCInitTo",
+        "params": ["waypoint1","waypoint2"],
+        "returns": 0.0
     }
 ]
