@@ -1,39 +1,238 @@
 #include <jsonrpc/rpc.h>
-#include <iostream>
+#include <jsonrpc/json/json.h>
 #include <vector>
 #include <stdlib.h>
 #include <string>
 #include <sstream>
+#include <iostream>
+#include "WaypointGUI.cpp"
 
 #include "waypointstubclient.h"
 
 using namespace jsonrpc;
 using namespace std;
 
-void split(
-			vector<string> & aStringVector, /* return value */
-			const string & aString,
-			const string & aDelimiter
-			)
+class WaypointClient: public WaypointGUI, public waypointstubClient
 {
-	size_t start = 0, end = 0;
-	while (end != string::npos)
+	/** ClickedX is one of the callbacks for GUI controls.
+	 * Callbacks need to be static functions. But, static functions
+	 * cannot directly access instance data. This program uses "userdata"
+	 * to get around that by passing the instance to the callback
+	 * function. The callback then accesses whatever GUI control object
+	 * that it needs for implementing its functionality.
+	 */
+	static void ClickedX(Fl_Widget * w, void * userdata)
 	{
-		end = aString.find(aDelimiter, start);
-		// If at end, use length=maxLength.  Else use length=end-start.
-		aStringVector.push_back(
-								aString.substr(
-												start,
-												(end == string::npos) ? string::npos : end - start
-												)
-								);
-		// If at end, use start=maxSize.  Else use start=end+delimiter.
-		start = (
-					(end > (string::npos - aDelimiter.size())) ?
-						string::npos : end + aDelimiter.size()
-				);
+		cout << "You clicked Exit" << endl;
+		exit(1);
 	}
-}
+
+	static void ClickedRemoveWP(Fl_Widget* w, void* userdata)
+	{
+		WaypointClient* anInstance = (WaypointClient*) userdata;
+		Fl_Input_Choice* fromWPChoice = anInstance->frWps;
+		Fl_Input_Choice* toWPChoice = anInstance->toWps;
+
+		string selected(fromWPChoice->value());
+
+		if (anInstance->removeWaypoint(selected) == true)
+		{
+			cout << "Removed: 	Waypoint(" << selected << "); \n" << endl;
+		}
+		else
+		{
+			cout << "Error:		Waypoint(" << selected << ") did not exist! \n" << endl;
+		}
+
+		buildWaypointList(anInstance);
+	}
+
+	static void ClickedAddWP(Fl_Widget * w, void * userdata)
+	{
+		WaypointClient* anInstance = (WaypointClient*) userdata;
+		Fl_Input_Choice * fromWPChoice = anInstance->frWps;
+		Fl_Input_Choice * toWPChoice = anInstance->toWps;
+
+		Fl_Input * theLat = anInstance->latIn;
+		Fl_Input * theLon = anInstance->lonIn;
+		Fl_Input * theEle = anInstance->eleIn;
+		Fl_Input * theName = anInstance->nameIn;
+
+		string lat(theLat->value());
+		string lon(theLon->value());
+		string ele(theEle->value());
+		string name(theName->value());
+
+		Json::Value wp;
+		wp["name"] = name.c_str();
+		wp["lat"] = atof(lat.c_str());
+		wp["lon"] = atof(lon.c_str());
+		wp["ele"] = atof(ele.c_str());
+
+
+		if (anInstance->addWaypoint(wp) == true)
+		{
+			cout << "Added: 		Waypoint(" << name << "); \n" << endl;
+		}
+		else
+		{
+			cout << "Error:			Waypoint(" << name << ") could not be added! \n" << endl;
+		}
+
+		buildWaypointList(anInstance);
+	}
+
+	static void ClickedModifyWP(Fl_Widget * w, void * userdata)
+	{
+		WaypointClient* anInstance = (WaypointClient*) userdata;
+
+		Fl_Input * theLat = anInstance->latIn;
+		Fl_Input * theLon = anInstance->lonIn;
+		Fl_Input * theEle = anInstance->eleIn;
+		Fl_Input * theName = anInstance->nameIn;
+
+		string lat(theLat->value());
+		string lon(theLon->value());
+		string ele(theEle->value());
+		string name(theName->value());
+
+		Json::Value wp;
+		wp["name"] = name.c_str();
+		wp["lat"] = atof(lat.c_str());
+		wp["lon"] = atof(lon.c_str());
+		wp["ele"] = atof(ele.c_str());
+
+		anInstance->removeWaypoint(name);
+		anInstance->addWaypoint(wp);
+
+		cout << "Modified:	" << name << "(" << lat << ", " << lon << ", " << ele << ", " << name << ");" << endl;
+		buildWaypointList(anInstance);
+	}
+
+	static void SelectedFromWP(Fl_Widget * w, void * userdata)
+	{
+		WaypointClient* anInstance = (WaypointClient*) userdata;
+		Fl_Input_Choice* frWps = anInstance->frWps;
+
+		string selected(frWps->value());
+		cout << "Selected:	" << selected << ";" << endl;
+
+		try
+		{
+			Json::Value result = anInstance->getWaypoint(selected);
+
+			if (result.get("result","NOT ERROR") == "ERROR")
+			{
+				cout << "Unsuccessful grab" << endl;
+				anInstance->nameIn->value("ERROR");
+				anInstance->latIn->value("0");
+				anInstance->lonIn->value("0");
+				anInstance->eleIn->value("0");
+			}
+			else
+			{
+				string lat = to_string(result["lat"].asDouble());
+				string lon = to_string(result["lon"].asDouble());
+				string ele = to_string(result["ele"].asDouble());
+				anInstance->nameIn->value(result["name"].asCString());
+				anInstance->latIn->value(lat.c_str());
+				anInstance->lonIn->value(lon.c_str());
+				anInstance->eleIn->value(ele.c_str());
+				cout << "Successful grab" << endl;
+			}
+
+		}
+		catch (exception &e)
+		{
+			cout << e.what() << endl;
+
+		}
+	}
+
+	static void SelectedToWP(Fl_Widget * w, void * userdata)
+	{
+		WaypointClient* anInstance = (WaypointClient*) userdata;
+		Fl_Input_Choice* toWps = anInstance->toWps;
+
+		string selected(toWps->value());
+		cout << "Selected:	" << selected << ";" << endl;
+
+		try
+		{
+			Json::Value result = anInstance->getWaypoint(selected);
+
+			if (result.get("result","NOT ERROR") == "ERROR")
+			{
+				cout << "Unsuccessful grab" << endl;
+				anInstance->nameIn->value("ERROR");
+				anInstance->latIn->value("0");
+				anInstance->lonIn->value("0");
+				anInstance->eleIn->value("0");
+			}
+			else
+			{
+				string lat = to_string(result["lat"].asDouble());
+				string lon = to_string(result["lon"].asDouble());
+				string ele = to_string(result["ele"].asDouble());
+				anInstance->nameIn->value(result["name"].asCString());
+				anInstance->latIn->value(lat.c_str());
+				anInstance->lonIn->value(lon.c_str());
+				anInstance->eleIn->value(ele.c_str());
+				cout << "Successful grab" << endl;
+			}
+
+		}
+		catch (exception &e)
+		{
+			cout << e.what() << endl;
+
+		}
+	}
+
+	static void buildWaypointList(WaypointClient* userdata)
+	{
+		WaypointClient* anInstance = (WaypointClient*) userdata;
+		Fl_Input_Choice * fromWPChoice = anInstance->frWps;
+		Fl_Input_Choice * toWPChoice = anInstance->toWps;
+
+		fromWPChoice->clear();
+		toWPChoice->clear();
+		Json::Value waypointsArray = anInstance->getWaypoints().get("waypoints",0);
+		if (waypointsArray.size() == 0)
+		{
+			fromWPChoice->add("EMPTY");
+			toWPChoice->add("EMPTY");
+		}
+		else
+		{
+			for (Json::ValueIterator itr = waypointsArray.begin(); itr != waypointsArray.end(); itr++)
+			{
+				Json::Value waypoint = *itr;
+				string name = waypoint["name"].asString();
+				fromWPChoice->add(name.c_str());
+				toWPChoice->add(name.c_str());
+			}
+
+		}
+		fromWPChoice->value(0);
+		toWPChoice->value(0);
+		SelectedFromWP(NULL, anInstance);
+	}
+
+public:
+	WaypointClient(const char * name = 0, const char * host = 0) :
+			WaypointGUI(name), waypointstubClient(new HttpClient(host))
+	{
+		removeWPButt->callback(ClickedRemoveWP, (void*) this);
+		addWPButt->callback(ClickedAddWP, (void*) this);
+		frWps->callback(SelectedFromWP, (void*) this);
+		toWps->callback(SelectedToWP, (void*) this);
+		modWPButt->callback(ClickedModifyWP, (void*) this);
+		//importJSONButt->callback(ClickedImportJSON, (void*) this);
+		callback(ClickedX);
+		buildWaypointList(this);
+	}
+};
 
 int main(int argc, char*argv[])
 {
@@ -45,75 +244,8 @@ int main(int argc, char*argv[])
 		 cout << host << endl;
 	 }
 
-	waypointstubClient wc(new HttpClient(host));
-	try {
-		string inLine;
-		cout << "Connected to: " << wc.serviceInfo() << endl;
+	WaypointClient cm("Jacob Dobkins' Waypoint Browser", host.c_str());
 
-		while (true)
-		{
-			cout << "Methods: \n"
-					"	add lat lon ele name -- eg:add 1 2 3 ASU-Poly \n"
-					"	addWaypoint jsonWaypoint -- eg:addWaypoint {\"lat\":1,\"lon\":2,\"ele\":3,\"name\":\"ASU-POLY\"} \n"
-					"	removeWaypoint name -- eg:removeWaypoint ASU-Poly \n"
-					"Input>	";
-			getline(cin, inLine);
-
-			vector<string> tokens;
-			split(tokens, inLine, " ");
-
-			if (tokens.size() > 1)
-			{
-				//Waypoints
-				if (tokens[0] == "add")
-				{
-					double lat, lon, ele;
-
-					string name = tokens[4];
-					istringstream latStream(tokens[1]);
-					latStream >> lat;
-					istringstream lonStream(tokens[2]);
-					lonStream >> lon;
-					istringstream eleStream(tokens[3]);
-					eleStream >> ele;
-
-					wc.add(lat, lon, ele, name);
-					cout << "Sent: 	Waypoint(" << lat << ", " << lon << ", " << ele << ", " << name << "); \n" << endl;
-				}
-				else if (tokens[0] == "addWaypoint")
-				{
-					Json::Reader reader;
-					Json::Value root;
-
-					reader.parse(tokens[1], root);
-
-					wc.addWaypoint(root);
-					cout << "Sent: 	Waypoint " << tokens[1] << "\n" << endl;
-				}
-				else if (tokens[0] == "removeWaypoint")
-				{
-					string name = tokens[1];
-
-					if (wc.removeWaypoint(name) == true)
-					{
-						cout << "Removed: 	Waypoint(" << name << "); \n" << endl;
-					}
-					else
-					{
-						cout << "Error:	Waypoint(" << name << ") did not exist! \n" << endl;
-					}
-
-				}
-			}
-			else if (tokens[0] == "end")
-			{
-				break;
-			}
-		}
-	}
-	catch (JsonRpcException e)
-	{
-		cerr << e.what() << endl;
-	}
+	return (Fl::run());
 }
 

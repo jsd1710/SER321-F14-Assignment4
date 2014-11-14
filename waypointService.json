@@ -27,7 +27,7 @@
     {	//This is how you define a method with positional parameters.
         "method": "getWaypoints",
         "params": [],
-        "returns": [{"name":"ASU-Poly","lat":0.0,"lon":0.0,"ele":0.0},{"name":"ASU-Tempe","lat":1.0,"lon":1.0,"ele":1.0}]
+        "returns": {"waypoints":[{"name":"ASU-Poly","lat":0.0,"lon":0.0,"ele":0.0},{"name":"ASU-Tempe","lat":1.0,"lon":1.0,"ele":1.0}]}
     },
     {	//This is how you define a method with positional parameters.
         "method": "getDistanceGCTo",

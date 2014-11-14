@@ -100,21 +100,19 @@ Json::Value WaypointServer::getWaypoint(const string& name)
 		double lon = temp.lon;
 		double ele = temp.ele;
 
-		std::ostringstream waypointStringStream;
-		waypointStringStream << "{\"name\":" << name << ","
-				<< "\"lat\":" << lat << ","
-				<< "\"lon\":" << lon << ","
-				<< "\"ele\":" << ele << "}";
-		std::string waypointString = waypointStringStream.str();
-
-		Json::Value jsonWaypoint(waypointString);
+		Json::Value jsonWaypoint;
+		jsonWaypoint["lat"] = lat;
+		jsonWaypoint["lon"] = lon;
+		jsonWaypoint["ele"] = ele;
+		jsonWaypoint["name"] = name;
 		return jsonWaypoint;
 
 	}
 	else
 	{
 		cout << "Error:		There was no '" << name << "' Waypoint!" << endl;
-		Json::Value result("{\"result\":\"ERROR\"}");
+		Json::Value result;
+		result["result"] = "ERROR";
 		return result;
 	}
 }
@@ -151,7 +149,8 @@ Json::Value WaypointServer::getWaypoints()
 	Json::Value temp(output);
 
 	cout << "SENT JSONArray:	" << temp.asString() << endl;
-	return temp;
+	return waypointJSONObject;
+	//return temp;
 }
 
 double WaypointServer::getDistanceGCTo(const string& w1, const string& w2)

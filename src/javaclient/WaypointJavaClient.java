@@ -133,7 +133,8 @@ public class WaypointJavaClient extends WaypointGUI implements WaypointInterface
 			String ret = begin + toInsert + end;
 			String resultString = server.call(ret);
 
-			result = new JSONObject(new JSONObject(resultString).getString("result"));
+			JSONObject resultJSON = new JSONObject(resultString);
+			result = resultJSON.getJSONObject("result");
 			
 			return result;
 		} 
@@ -321,6 +322,7 @@ public class WaypointJavaClient extends WaypointGUI implements WaypointInterface
 				String w2 = toWaypointBox.getSelectedItem().toString();
 				distBearIn.setText(format.format(getDistanceGCTo(w1, w2)) + "/" + format.format(getBearingGCInitTo(w1, w2)));
 				System.out.println("Successfully calculated distance/bearing: " + distBearIn.getText());
+				buildWaypointsList();
 			} 
 			catch (Exception e) 
 			{
