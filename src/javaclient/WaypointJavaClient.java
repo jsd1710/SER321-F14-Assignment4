@@ -167,7 +167,6 @@ public class WaypointJavaClient extends WaypointGUI implements WaypointInterface
 		}
 	}
 	
-
 	public boolean removeWaypoint(String name) 
 	{
 		String toInsert = "[\"" + name + "\"]";
@@ -183,7 +182,6 @@ public class WaypointJavaClient extends WaypointGUI implements WaypointInterface
 		}
 	}
 	
-
 	public boolean addWaypoint(String jsonString) 
 	{
 		JSONObject waypointJSON = new JSONObject(jsonString);
@@ -201,7 +199,6 @@ public class WaypointJavaClient extends WaypointGUI implements WaypointInterface
 		}
 	}
 	
-
 	public JSONObject getWaypoint(String name)
 	{
 		String toInsert = "[\"" + name + "\"]";
@@ -209,7 +206,6 @@ public class WaypointJavaClient extends WaypointGUI implements WaypointInterface
 		
 		return waypointObject;
 	}
-	
 	
 	public JSONArray getWaypoints()
 	{
@@ -335,7 +331,6 @@ public class WaypointJavaClient extends WaypointGUI implements WaypointInterface
 		System.out.println();
 	}
 	
-	
 	public void itemStateChanged(ItemEvent e) 
 	{
 		if(e.getStateChange() == ItemEvent.SELECTED)
@@ -425,7 +420,7 @@ public class WaypointJavaClient extends WaypointGUI implements WaypointInterface
 
 			if (args.length > 1) 
 			{
-				url = args[1];
+				url = "http://" + args[0] + ":" + args[1] + "/";
 			}
 
 			WaypointJavaClient wjc = new WaypointJavaClient(url);

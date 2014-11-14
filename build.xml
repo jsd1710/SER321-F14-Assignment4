@@ -17,7 +17,10 @@
 		<echo
        message="Targets are clean, prepare, generate.server.stub, build.server, build.client, build.java.client, targets"/>
 		<echo
-       message="invoke java client with: java -cp classes:lib/java-json.org.jar cst420.jsonrpc.CalcJavaClient http://localhost:8080"/>
+       message="invoke java client with: java -cp classes:lib/java-json.org.jar -Djava.security.policy=policyClient assignment4.WaypointJavaClient ${host.name} ${port.num}"/>
+		<echo message="OR"/>
+		<echo message="ant execute.java.client -Dhost.name=192.168.2.2 -Dport.num=8080"/>
+		<echo message="invoke cpp client with: ./bin/WaypointRPCClient 192.168.2.2 8080"/>
 	</target>
 
 	<path id="compile.classpath">
@@ -192,13 +195,14 @@
 			<arg line="${port.num}"/>
 		</exec>
 	</target>
+	
 	<target name="execute.java.client" depends="prepare" description="Run the java client">
-		<echo message="command line client: java -cp classes -Djava.security.policy=policyClient cst420.jsonrpc.WaypointJavaClient http://${host.name}:${port.num}" />
+		<echo message="command line client: java -cp classes:lib/java-json.org.jar -Djava.security.policy=policyClient assignment4.WaypointJavaClient ${host.name} ${port.num}" />
 		<java classname="assignment4.WaypointJavaClient" fork="yes">
 			<classpath refid="compile.classpath"/>
 			<sysproperty key="java.security.policy" value="policyClient"/>
-			<arg value="${user.name}"/>
-			<arg value="http://${host.name}:${port.num}"/>
+			<arg value="${host.name}"/>
+			<arg value="${port.num}"/>
 		</java>
 	</target>
 
